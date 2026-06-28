@@ -1,62 +1,82 @@
-# AI-102 Exam Ready Study Guide
+# AI-102 Practice Quiz (React + Vite)
 
-A local, interactive React + TypeScript study platform for Microsoft Exam AI-102: Designing and Implementing a Microsoft Azure AI Solution.
+An interactive practice quiz for the **Microsoft AI-102: Designing & Implementing a Microsoft Azure AI Solution** exam — 331 questions across the six official skills-measured domains, with verified answers, explanations, and Microsoft Learn links.
 
-This app is aligned to the official Microsoft Learn AI-102 study guide and skills measured as of December 23, 2025. AI-102 retires on June 30, 2026. Community tips are marked as unofficial and the app does not include exam dumps.
+> ⚠️ The AI-102 exam retires **30 June 2026**. Answers were cross-checked against Microsoft documentation; where a source's marked answer conflicted with the docs, the documented answer is used and noted in the explanation.
 
-## Features
+## Prerequisites
 
-- Dashboard with progress, weakest topics, XP, badges, streak, readiness score, and retirement countdown.
-- Topic pages for all six AI-102 domains.
-- Expandable lessons with simple explanations, testing focus, C# snippets, traps, and cheat summaries.
-- 60 flashcards, 10 per major exam domain.
-- 60 quiz questions, 10 per major exam domain, including scenario and boss-fight questions.
-- Timed 25-minute mixed mock exam mode with wrong-option explanations.
-- Cheat sheets, service selection matrix, SDK/REST reference, Responsible AI checklist, RAG/Agents checklist, and exam day checklist.
-- Labs with goal, steps, expected result, and exam relevance.
-- Dark/light mode and local storage progress tracking.
+- **Node.js 18+** (includes npm). Check with `node -v`. If you don't have it, install from https://nodejs.org.
 
-## Setup
+## Run it
 
 ```bash
-npm install
-npm run dev
+cd ai-102-quiz
+npm install      # first time only — downloads dependencies
+npm run dev      # starts the dev server and opens http://localhost:5173
 ```
 
-Then open the local Vite URL, usually:
-
-```text
-http://localhost:5173
-```
-
-## Build
+To create a production build (a static site in `dist/` you can host anywhere):
 
 ```bash
 npm run build
+npm run preview  # serve the built site locally to check it
 ```
 
-## Source of truth
+## Features
 
-Use official Microsoft Learn documentation as the source of truth:
+- **Six domain filters** (Plan & Manage, Generative AI, Agentic, Computer Vision, NLP & Speech, Knowledge Mining & Doc Intelligence).
+- **Auto-graded** single-choice, multi-select, and yes/no questions with instant feedback.
+- **Real drag-and-drop ordering** questions — reorder tiles by dragging or with the ▲▼ buttons, then *Check order* grades each position.
+- **Reveal cards** for hotspot / matching / simulation questions (self-assess against the model answer).
+- Every question links to **Microsoft Learn**.
+- Filters: only unanswered, only incorrect, only flagged, only auto-graded, only drag & drop.
+- Shuffle, flag for review, jump-to, score/accuracy tracking.
+- Progress is saved in your browser (localStorage).
+- Keyboard: `←` / `→` navigate, `F` flag.
 
-- AI-102 study guide: https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102
-- Foundry Tools: https://learn.microsoft.com/en-us/azure/ai-services/what-are-ai-services
-- Azure OpenAI in Foundry Models: https://learn.microsoft.com/en-us/azure/ai-services/openai/overview
-- Azure AI Foundry Agent Service: https://learn.microsoft.com/en-us/azure/ai-foundry/agents/
-- Azure AI Search: https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search
-- Azure Document Intelligence: https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/overview
-- Azure Content Understanding: https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/overview
+## Project structure
 
-## Data model
+```
+ai-102-quiz/
+├── index.html              # Vite entry HTML
+├── package.json            # scripts + dependencies
+├── vite.config.js
+└── src/
+    ├── main.jsx            # React entry point
+    ├── App.jsx             # state, filtering, navigation, persistence
+    ├── quiz.css            # dark theme styles
+    ├── utils.js            # shuffle / permutation / option helpers + constants
+    ├── data/
+    │   └── questions.json  # the 331-question bank (edit here to add/fix questions)
+    └── components/
+        ├── Controls.jsx    # domain chips, filters, stats bar
+        ├── QuestionCard.jsx# renders MC, reveal, and the answer/explanation block
+        └── DragOrder.jsx   # interactive drag-and-drop ordering
+```
 
-Structured seed content lives in:
+## Editing the questions
 
-- `src/data/examDomains.ts`
-- `src/data/lessons.ts`
-- `src/data/flashcards.ts`
-- `src/data/quizzes.ts`
-- `src/data/labs.ts`
-- `src/data/cheatSheets.ts`
-- `src/data/serviceMatrix.ts`
+Each entry in `src/data/questions.json` looks like:
 
-Progress is stored locally in `localStorage` under `ai102-progress`.
+```jsonc
+{
+  "id": 5,
+  "domain": "Plan & Manage",
+  "type": "single",              // single | multi | yesno | hotspot | sequence
+  "page": 3,                      // page in the source PDF (reference only)
+  "label": "Topic 1 Q#5",
+  "question": "…full question…",
+  "options": ["A. …", "B. …"],   // for MC; for reveal types these are the choices
+  "correct": ["C"],              // letters for MC; empty for sequence/hotspot
+  "order": ["step 1", "step 2"], // ONLY for drag-and-drop: the correct sequence
+  "correctText": "…model answer…",
+  "explanation": "…why…",
+  "mlUrl": "https://learn.microsoft.com/…",
+  "mlTitle": "Microsoft Learn",
+  "mc": true,                    // true => auto-graded multiple choice
+  "autograded": true             // true for MC and drag-order questions
+}
+```
+
+Save the file and the dev server hot-reloads automatically.
